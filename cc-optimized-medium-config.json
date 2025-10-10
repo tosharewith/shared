@@ -1,0 +1,47 @@
+{
+    "mapGlobal": {
+        "project-root": "CC-COBOL-Optimized-Analysis",
+        "client-name": "cc-cobol-medium-performance",
+        "root": "/Users/gregoriomomm/workspace/_demo_itau/poc_cc/arc-stand-alone/data/source/cc",
+
+        "parameter-encoding": "UTF-8",
+        "parameter-language-processing-list": "cbl,jcl,asm",
+        "parameter-language-processing": "preprocess,tokenize,structure,analyze,mamintegration,bre",
+
+        "parameter-max-loop-recursion": "250",
+        "parameter-max-loop-size": "2500",
+        "parameter-max-number-of-business-rules": "1000",
+        "parameter-max-paths": "-1",
+
+        "parameter-debug-graph-level": "2",
+        "parameter-debug-level": "2",
+        "parameter-warning-level": "1",
+        "parameter-profile-level": "2",
+        "parameter-profile-threshold": "100",
+
+        "parameter-add-external-address-calls": "true",
+        "parameter-generate-business-rules-with-trace": "true",
+        "parameter-generate-excel-reports": "false",
+        "parameter-generate-html-reports": "true",
+        "parameter-generate-undefined-variables": "true",
+        "parameter-show-intermediate-steps": "false",
+        "parameter-use-complex-loop-detection": "true",
+        "parameter-use-advanced-loop-analysis": "false",
+        "parameter-use-extended-ssa": "true",
+        "parameter-resolve-dynamic-mutations": "true",
+        "parameter-resolve-addresses": "true",
+        "parameter-resolve-displacements": "true",
+        "parameter-resolve-equivalence": "true",
+        "parameter-use-recursion-monitor": "true",
+        "parameter-save-history": "false",
+        "parameter-show-each-loop-isolation": "false",
+        "parameter-validate-ssa": "true",
+        "parameter-detail-results": "true",
+
+        "parameter-source-filter": "",
+        "parameter-path-filter": "",
+        "parameter-path-exclusion-filter": "*.docx,*.xlsx,*.pdf,*.backup,*.orig",
+        "parameter-tab-size": "4",
+        "parameter-use-absolute-source-paths": "true"
+    }
+}

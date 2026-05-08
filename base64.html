@@ -1,0 +1,114 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>base64</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  body{background:#0f1115;color:#e6e6e6;min-height:100vh;display:grid;place-items:center;padding:1.5rem}
+  main{width:100%;max-width:720px;display:grid;gap:.75rem}
+  h1{font-size:.85rem;letter-spacing:.2em;color:#7aa2f7;font-weight:600;text-transform:uppercase}
+  .row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+  .seg{display:inline-flex;background:#1a1d24;border:1px solid #262a33;border-radius:.5rem;overflow:hidden}
+  .seg button{padding:.45rem .9rem;background:transparent;border:0;color:#9aa0aa;cursor:pointer;font-size:.8rem}
+  .seg button.on{background:#7aa2f7;color:#0f1115;font-weight:600}
+  textarea{width:100%;min-height:170px;padding:.85rem;background:#1a1d24;color:#e6e6e6;border:1px solid #262a33;border-radius:.6rem;resize:vertical;font-size:.85rem;line-height:1.5;outline:none;transition:border-color .15s}
+  textarea:focus{border-color:#7aa2f7}
+  .lbl{font-size:.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:.15em;display:flex;justify-content:space-between;align-items:baseline}
+  .lbl span{color:#9aa0aa;text-transform:none;letter-spacing:0;font-size:.75rem}
+  .actions{display:flex;gap:.5rem;flex-wrap:wrap}
+  button.act{padding:.5rem .9rem;background:#1a1d24;border:1px solid #262a33;color:#e6e6e6;border-radius:.5rem;cursor:pointer;font-size:.78rem;transition:all .15s}
+  button.act:hover{border-color:#7aa2f7;color:#7aa2f7}
+  button.act:active{transform:translateY(1px)}
+  .err{color:#f7768e;font-size:.78rem;min-height:1.1em}
+  .ok{color:#9ece6a}
+</style>
+
+<main>
+  <div class="row" style="justify-content:space-between">
+    <h1>base64</h1>
+    <div class="seg" role="tablist">
+      <button id="mEnc" class="on" aria-pressed="true">encode</button>
+      <button id="mDec" aria-pressed="false">decode</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="lbl"><span style="text-transform:uppercase;letter-spacing:.15em">input</span><span id="iStat">0 chars</span></div>
+    <textarea id="in" autofocus spellcheck="false" placeholder="type or paste here…"></textarea>
+  </div>
+
+  <div>
+    <div class="lbl"><span style="text-transform:uppercase;letter-spacing:.15em">output</span><span id="oStat">0 chars</span></div>
+    <textarea id="out" readonly spellcheck="false" placeholder="result appears as you type"></textarea>
+  </div>
+
+  <div class="row" style="justify-content:space-between">
+    <div class="actions">
+      <button class="act" id="copy">copy</button>
+      <button class="act" id="swap" title="output → input">↑ use as input</button>
+      <button class="act" id="clear">clear</button>
+    </div>
+    <span class="err" id="msg"></span>
+  </div>
+</main>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const inp = $('in'), out = $('out'), msg = $('msg');
+  let mode = 'enc';
+
+  const setMode = m => {
+    mode = m;
+    $('mEnc').classList.toggle('on', m === 'enc');
+    $('mDec').classList.toggle('on', m === 'dec');
+    $('mEnc').setAttribute('aria-pressed', m === 'enc');
+    $('mDec').setAttribute('aria-pressed', m === 'dec');
+    inp.placeholder = m === 'enc' ? 'type or paste plain text…' : 'paste base64 here…';
+    run();
+  };
+
+  const flash = (t, cls = 'err') => {
+    msg.textContent = t;
+    msg.className = cls;
+    if (cls === 'ok') setTimeout(() => msg.textContent === t && (msg.textContent = ''), 1500);
+  };
+
+  const run = () => {
+    const v = inp.value;
+    $('iStat').textContent = v.length + ' chars';
+    if (!v) { out.value = ''; $('oStat').textContent = '0 chars'; msg.textContent = ''; return; }
+    try {
+      const r = mode === 'enc'
+        ? btoa(String.fromCharCode(...new TextEncoder().encode(v)))
+        : new TextDecoder().decode(Uint8Array.from(atob(v.replace(/\s/g,'')), c => c.charCodeAt(0)));
+      out.value = r;
+      $('oStat').textContent = r.length + ' chars';
+      msg.textContent = '';
+    } catch (e) {
+      out.value = '';
+      $('oStat').textContent = '—';
+      flash(mode === 'dec' ? 'invalid base64' : 'encode failed');
+    }
+  };
+
+  $('mEnc').onclick = () => setMode('enc');
+  $('mDec').onclick = () => setMode('dec');
+  inp.addEventListener('input', run);
+
+  $('copy').onclick = async () => {
+    if (!out.value) return flash('nothing to copy');
+    try { await navigator.clipboard.writeText(out.value); flash('copied', 'ok'); }
+    catch { out.select(); document.execCommand('copy'); flash('copied', 'ok'); }
+  };
+  $('swap').onclick = () => {
+    if (!out.value) return;
+    inp.value = out.value;
+    setMode(mode === 'enc' ? 'dec' : 'enc');
+    inp.focus();
+  };
+  $('clear').onclick = () => { inp.value = out.value = ''; $('iStat').textContent = $('oStat').textContent = '0 chars'; msg.textContent = ''; inp.focus(); };
+
+  // ctrl/cmd+enter swaps direction
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); setMode(mode === 'enc' ? 'dec' : 'enc'); }
+  });
+</script>
